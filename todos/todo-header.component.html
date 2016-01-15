@@ -1,0 +1,11 @@
+<header class="o-clearfix u-py2 u-border-bottom">
+	<div class="o-col o-col-1 u-align-center">
+		<input type="checkbox" (click)="toggleTodosStatus($event)" [checked]="checkTodosStatus()" />
+	</div>
+	<div class="o-col o-col-10">
+		<input type="text" placeholder="What needs to be done?" class="c-field c-field-block" (keyup.enter)="createTodo($event)" [(ngModel)]="newTodo" />
+	</div>
+	<div class="o-col o-col-1">
+		<span class="s-red-500 u-pointer" *ngIf="newTodo" (click)="resetNewTodo()">x</span>
+	</div>
+</header>

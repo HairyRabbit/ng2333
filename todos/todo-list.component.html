@@ -1,0 +1,7 @@
+<section *ngIf="getTodos().length">
+	<ul class="u-listReset u-m0 u-p0">
+		<li class="u-listLine" *ngFor="#todo of getTodos()">
+			<todo-item [todo]="todo" (toggleTodoState)="toggleTodoState"></todo-item>
+		</li>
+	</ul>
+</section>

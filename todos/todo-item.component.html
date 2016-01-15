@@ -1,0 +1,12 @@
+<div class="o-clearfix u-py2 is-mouseOn">
+	<div class="o-col o-col-1 u-align-center">
+		<input type="checkbox" [checked]="todo.status === 'completed'" (change)="toggleState()" />
+	</div>
+	<div class="o-col o-col-10">
+		<div [class.s-throughLine]="todo.status === 'completed'" [class.s-gray-300]="todo.status === 'completed'" *ngIf="!isEdit" (dblclick)="changeEditState($event)">{{todo.content}}</div>
+		<input type="text" class="c-field c-field-block" [(ngModel)]="todo.content" *ngIf="isEdit" (blur)="changeEditState()" (keyup.enter)="changeEditState()" />
+	</div>
+	<div class="o-col o-col-1 destory">
+		<span class="s-red-500 u-pointer" (click)="deleteTodo()">x</span>
+	</div>
+</div>

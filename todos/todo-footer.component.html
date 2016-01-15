@@ -1,0 +1,13 @@
+<footer class="o-clearfix u-py1 u-border-top" *ngIf="getTodosCount()">
+	<div class="o-col o-col-3 s-smaller s-gray-500 u-p1">
+		{{getActiveTodosCount()}} 项 剩余
+	</div>
+	<div class="o-col o-col-6 u-align-center">
+		<a class="s-linkReset c-btn u-border s-smaller u-rounded s-gray-700" [routerLink]="['Todos', { status: '' }]">全部</a>
+		<a class="s-linkReset c-btn u-border s-smaller u-rounded s-gray-700" [routerLink]="['Todos', { status: 'active' }]">未完成</a>
+		<a class="s-linkReset c-btn u-border s-smaller u-rounded s-gray-700" [routerLink]="['Todos', { status: 'completed' }]">已完成</a>
+	</div>
+	<div class="o-col o-col-3 s-smaller s-gray-500 u-align-right u-p1">
+		<span (click)="deleteCompletedTodos()">清除已完成的项</span>
+	</div>
+</footer>
