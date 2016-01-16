@@ -5,24 +5,15 @@ import { truth } from '../util'
  * 后端响应
  */
 class Response {
-		// 时间截
 		datetime: number
-		// 错误信息
 		error: string
-		
-		constructor(private error: string = '') {
-				this.datetime = +new Date
-				this.error = error
+		constructor(err: string = '',
+								timestamp: number = +new Date) {
+				// 时间截
+				this.datetime = timestamp
+				// 错误信息
+				this.error = err
 		}
-}
-
-/**
- * Todo 类型
- */
-export interface Todo {
-		id: string
-v		content: string
-		status: boolean
 }
 
 /**
@@ -30,9 +21,9 @@ v		content: string
  */
 export enum TodoStatus {
 		// 未完成
-		Active = 'active',
+		Active,
 		// 已完成
-		Completed = 'completed'
+		Completed
 }
 
 /**
@@ -56,9 +47,33 @@ export function isCompleted(todo: Todo): boolean {
 }
 
 /**
+ * 根据 state 返回 TodoStatus
+ *
+ * @param {String} state
+ * @return {TodoStatus}
+ */
+export function matchStatus(state: string): TodoStatus {
+		return ((state) => {
+				switch state {
+				case 'active': return TodoStatus.Active;
+				case 'completed': return TodoStatus.Completed;
+				}
+		})(state);
+}
+
+/**
+ * Todo 类型
+ */
+export interface TodoInterface {
+		id: string
+		content: string
+		status: TodoStatus
+}
+
+/**
  * Todo
  */
-class Todo {
+export class Todo implements TodoInterface {
 		// id
 		id: string
 		// 内容
@@ -66,11 +81,8 @@ class Todo {
 		// 状态
 		status: TodoStatus
 
-		constructor(
-				private content: string,
-				private status: TodoStatus = TodoStatus.Active,
-				private id?: string
-		) {
+		constructor(content: string,
+								status: TodoStatus = TodoStatus.Active) {
 				this.id = uuid.v4()
 				this.content = content.trim()
 				this.status = status
