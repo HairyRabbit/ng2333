@@ -4,7 +4,7 @@ import { truth } from '../util'
 /**
  * 后端响应
  */
-class Response {
+export class Response {
 		datetime: number
 		error: string
 		constructor(err: string = '',
@@ -46,6 +46,10 @@ export function isCompleted(todo: Todo): boolean {
 		return todo.status === TodoStatus.Completed
 }
 
+function idTodo(todo: Todo): boolean {
+		return true
+}
+
 /**
  * 根据 state 返回 TodoStatus
  *
@@ -54,11 +58,12 @@ export function isCompleted(todo: Todo): boolean {
  */
 export function matchStatus(state: string): TodoStatus {
 		return ((state) => {
-				switch state {
-				case 'active': return TodoStatus.Active;
-				case 'completed': return TodoStatus.Completed;
+				switch(state) {
+				case 'active': return TodoStatus.Active
+				case 'completed': return TodoStatus.Completed
+				default: throw new Error('Does not match enum TodoStatus')
 				}
-		})(state);
+		})(state)
 }
 
 /**
@@ -104,17 +109,15 @@ export class TodosService {
 		 *
 		 * @return {Promise}
 		 */
-		getTodos(status?: string): Promise {
-				// 计算属性 根据 status 返回一个谓词函数，用于过滤列表
-				const filter: (status: string)=>boolean = ((status) => {
-						switch(status) {
-						case TodoStatus.Active: return isActive
-						case TodoStatus.Completed: return isCompleted
-						default: return truth
-						}
-				})(status)
+		getTodos(status?: string): Todo[] {
 				// 过滤列表
-				return this.todos.filter(filter)
+				return this.todos.filter((todo) => {
+						switch(todo.status) {
+						case TodoStatus.Active: return isActive(todo)
+						case TodoStatus.Completed: return isCompleted(todo)
+						default: return true
+						}
+				})
 		}
 
 		/**
@@ -123,7 +126,7 @@ export class TodosService {
 		 * @param {String} content - todo 内容
 		 * @return {Promise}
 		 */
-		createTodo(content: string): Promise {
+		createTodo(content: string): Promise<Response> {
 				// todo
 				const newTodo: Todo = new Todo(content)
 				// 添加到列表头部
@@ -138,7 +141,7 @@ export class TodosService {
 		 *
 		 * @return {Promise}
 		 */
-		deleteCompletedTodos(): Promise {
+		deleteCompletedTodos(): Promise<Response> {
 				// 过滤掉已完成的 todos
 				this.todos = this.todos.filter(isActive)
 				
@@ -152,15 +155,13 @@ export class TodosService {
 		 * @param {Boolean} state
 		 * @return {Promise}
 		 */
-		toggleTodosStatus(state: boolean): Promise {
+		toggleTodosStatus(state: boolean): Promise<Response> {
 				// 函数 返回一个更改 status 后的 todo， 用于 map
-				const todoIter: (todo: Todo)=>Todo = (todo) => new Todo(
-						todo.content,
-						state ? TodoStatus.Completed : TodoStatus.Active,
-						todo.id
-				)
+				const todoIter: (todo: Todo)=>void = (todo) => {
+						todo.status = state ? TodoStatus.Completed : TodoStatus.Active
+				}
 				// 更新全部 todo
-				this.todos = this.todos.map(todoIter)
+				this.todos.forEach(todoIter)
 				// 响应请求
 				const res = new Response()
 				return Promise.resolve(res)
@@ -195,7 +196,7 @@ export class TodosService {
 		 * @params {Todo} todo
 		 * @return {Promise}
 		 */
-		deleteTodo(todo: Todo): Promise {
+		deleteTodo(todo: Todo):  Promise<Response> {
 				const todos = this.todos
 				const idx = this.findTodoIndex(todo)
 				this.todos = [].concat(todos.slice(0, idx)).concat(todos.slice(idx + 1))
@@ -210,13 +211,17 @@ export class TodosService {
 		 * @params {Todo} todo
 		 * @return {Promise}
 		 */
-		toggleTodoState(todo: Todo): Promise {
+		toggleTodoState(todo: Todo):  Promise<Response> {
 				const todos = this.todos
 				const idx = this.findTodoIndex(todo)
-				
+
+				this.todos[idx].status = this.reverseState(this.todos[idx].status)
+
+				/*
 				this.todos = [].concat(todos.slice(0, idx)).concat(
 						new Todo(todo.content, this.reverseState(todo.status), todo.id)
 				).concat(todos.slice(idx + 1))
+				*/
 
 				// 响应请求
 				const res = new Response()
